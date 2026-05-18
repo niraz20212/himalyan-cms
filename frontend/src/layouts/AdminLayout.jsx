@@ -34,7 +34,7 @@ export function AdminLayout() {
       <main className="bg-[#f7f1e6] p-6 md:p-10">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <p className="text-sm text-[var(--muted)]">Signed in as {user?.name}</p>
+            <p className="text-sm text-[var(--muted)]">Welcome to the Admin,  {user?.name}</p>
             <h1 className="text-3xl font-semibold text-[var(--brand)]">Content Management</h1>
           </div>
           <button className="rounded-full border border-[var(--line)] px-4 py-2" onClick={() => dispatch(logoutThunk())}>
