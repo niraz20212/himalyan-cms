@@ -18,6 +18,7 @@ async function main() {
     update: {},
     create: {
       name: 'Super Admin',
+      lastName: 'User',
       email: 'admin@himalayanchurpi.com',
       password,
       roleId: superAdminRole.id,
@@ -30,6 +31,7 @@ async function main() {
     update: {},
     create: {
       name: 'Normal User',
+      lastName: 'Account',
       email: 'user@himalayanchurpi.com',
       password: userPassword,
       roleId: userRole.id,

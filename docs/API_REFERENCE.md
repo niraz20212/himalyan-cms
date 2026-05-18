@@ -45,7 +45,7 @@ Create a normal user account with role `USER`.
 ```bash
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d "{\"name\":\"Niraj User\",\"email\":\"niraj.user@example.com\",\"password\":\"User@123\"}"
+  -d "{\"name\":\"Niraj\",\"lastName\":\"Sharma\",\"email\":\"niraj.user@example.com\",\"password\":\"User@123\"}"
 ```
 
 ### POST `/api/auth/login`
@@ -75,6 +75,7 @@ Response shape:
     "user": {
       "id": "user-id",
       "name": "Super Admin",
+      "lastName": "User",
       "email": "admin@himalayanchurpi.com",
       "role": "SUPER_ADMIN"
     },
@@ -292,3 +293,10 @@ curl -X POST http://localhost:5000/api/admin/websiteSettings \
 3. Call `/api/auth/me` with the access token
 4. Refresh via `/api/auth/refresh`
 5. Logout via `/api/auth/logout`
+
+Required signup fields:
+
+- `name`
+- `lastName`
+- `email`
+- `password`

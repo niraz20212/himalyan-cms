@@ -19,6 +19,7 @@ model User {
   id            String         @id @default(cuid())
   roleId        String
   name          String
+  lastName      String         @default("")
   email         String         @unique
   password      String
   isActive      Boolean        @default(true)
@@ -27,6 +28,7 @@ model User {
   role          Role           @relation(fields: [roleId], references: [id])
   refreshTokens RefreshToken[]
   activityLogs  AdminActivity[]
+  orders        Order[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -111,6 +113,7 @@ model Product {
   images              ProductImage[]
   relatedProducts     RelatedProduct[] @relation("RelatedProductSource")
   linkedFromProducts  RelatedProduct[] @relation("RelatedProductTarget")
+  orders              Order[]
   seo                 Seo?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
@@ -391,4 +394,26 @@ model AdminActivity {
   createdAt  DateTime @default(now())
 
   @@index([userId, resource])
+}
+
+model Order {
+  id               String    @id @default(cuid())
+  userId           String
+  productId        String
+  orderType        String    @default("RETAIL")
+  quantity         String?
+  shippingAddress  String
+  country          String?
+  phone            String?
+  notes            String?
+  status           String    @default("NEW")
+  deletedAt        DateTime?
+  user             User      @relation(fields: [userId], references: [id])
+  product          Product   @relation(fields: [productId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@index([productId])
+  @@index([deletedAt])
 }

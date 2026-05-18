@@ -9,6 +9,7 @@ const samples = {
   pages: JSON.stringify({ title: 'About Us', slug: 'about-us', summary: 'About page', template: 'default' }, null, 2),
   websiteSettings: JSON.stringify({ key: 'homepage_video', value: { url: 'https://example.com/video.mp4' } }, null, 2),
   inquiries: JSON.stringify({ type: 'CONTACT', name: 'Jane Doe', email: 'jane@example.com', message: 'Hello' }, null, 2),
+  orders: JSON.stringify({ orderType: 'RETAIL', quantity: '100 packs', shippingAddress: 'Kathmandu, Nepal' }, null, 2),
 };
 
 export function ResourcePage() {

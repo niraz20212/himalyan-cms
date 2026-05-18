@@ -79,6 +79,18 @@ const resources = {
     include: {},
     orderBy: { createdAt: 'desc' },
   },
+  orders: {
+    model: 'order',
+    include: {
+      user: true,
+      product: {
+        include: {
+          category: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  },
 };
 
 module.exports = resources;

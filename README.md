@@ -106,6 +106,7 @@ curl http://localhost:5000/api/public/products
 ```
 
 Full API documentation with curl examples for admin and normal-user login flows is available in [docs/API_REFERENCE.md](C:\Users\ACER\IdeaProjects\himalayan-churpi-cms\docs\API_REFERENCE.md).
+Normal user signup now requires `name`, `lastName`, `email`, and `password`.
 
 ## Notes
 

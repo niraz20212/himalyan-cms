@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 const env = require('./config/env');
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
@@ -44,6 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

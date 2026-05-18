@@ -7,9 +7,15 @@ export const fetchBlogs = async () => (await api.get('/public/blogs')).data.data
 export const fetchBlog = async (slug) => (await api.get(`/public/blogs/${slug}`)).data.data;
 export const fetchPage = async (slug) => (await api.get(`/public/pages/${slug}`)).data.data;
 export const submitInquiry = async (payload) => (await api.post('/public/inquiries', payload)).data;
-export const adminLogin = async (payload) => (await api.post('/auth/login', payload)).data.data;
+export const loginUser = async (payload) => (await api.post('/auth/login', payload)).data.data;
+export const registerUser = async (payload) => (await api.post('/auth/register', payload)).data.data;
+export const fetchCurrentUser = async () => (await api.get('/auth/me')).data.data;
+export const logoutUser = async (refreshToken) => (await api.post('/auth/logout', { refreshToken })).data.data;
+export const createOrder = async (payload) => (await api.post('/orders', payload)).data.data;
+export const fetchMyOrders = async () => (await api.get('/orders/my')).data.data;
+export const fetchMyOrder = async (id) => (await api.get(`/orders/my/${id}`)).data.data;
 export const fetchAdminResource = async (resource) => (await api.get(`/admin/${resource}`)).data.data;
 export const createAdminResource = async (resource, payload) => (await api.post(`/admin/${resource}`, payload)).data.data;
 export const updateAdminResource = async (resource, id, payload) =>
-    (await api.put(`/admin/${resource}/${id}`, payload)).data.data;
+  (await api.put(`/admin/${resource}/${id}`, payload)).data.data;
 export const deleteAdminResource = async (resource, id) => (await api.delete(`/admin/${resource}/${id}`)).data;

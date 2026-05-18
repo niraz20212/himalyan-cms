@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../store/slices/authSlice';
+import { logoutThunk } from '../store/slices/authSlice';
 
 const navItems = [
   { label: 'Dashboard', href: '/admin' },
@@ -9,6 +9,7 @@ const navItems = [
   { label: 'Blogs', href: '/admin/blogs' },
   { label: 'Pages', href: '/admin/pages' },
   { label: 'Settings', href: '/admin/websiteSettings' },
+  { label: 'Orders', href: '/admin/orders' },
   { label: 'Inquiries', href: '/admin/inquiries' },
 ];
 
@@ -35,7 +36,7 @@ export function AdminLayout() {
             <p className="text-sm text-[var(--muted)]">Signed in as {user?.name}</p>
             <h1 className="text-3xl font-semibold text-[var(--brand)]">Content Management</h1>
           </div>
-          <button className="rounded-full border border-[var(--line)] px-4 py-2" onClick={() => dispatch(logout())}>
+          <button className="rounded-full border border-[var(--line)] px-4 py-2" onClick={() => dispatch(logoutThunk())}>
             Logout
           </button>
         </div>

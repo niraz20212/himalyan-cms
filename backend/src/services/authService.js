@@ -8,25 +8,28 @@ const { signAccessToken, signRefreshToken } = require('../utils/tokens');
 const serializeUser = (user) => ({
   id: user.id,
   name: user.name,
+  lastName: user.lastName,
   email: user.email,
   role: user.role?.name,
 });
 
-const register = async ({ name, email, password }) => {
+const register = async ({ name, lastName, email, password }) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     throw new AppError('Email already registered', 409);
   }
 
-  const userRole = await prisma.role.findUnique({ where: { name: 'USER' } });
-  if (!userRole) {
-    throw new AppError('Default USER role is not configured', 500);
-  }
+  const userRole = await prisma.role.upsert({
+    where: { name: 'USER' },
+    update: {},
+    create: { name: 'USER' },
+  });
 
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
     data: {
       name,
+      lastName,
       email,
       password: hashedPassword,
       roleId: userRole.id,
@@ -63,6 +66,11 @@ const login = async ({ email, password }) => {
   if (!matches) {
     throw new AppError('Invalid credentials', 401);
   }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLoginAt: new Date() },
+  });
 
   const payload = { id: user.id, role: user.role.name };
   const accessToken = signAccessToken(payload);

@@ -1,6 +1,4 @@
 const path = require('path');
-const app = require('./app');
-const prisma = require('./config/db');
 const env = require('./config/env');
 const runCommand = require('./utils/runCommand');
 
@@ -11,11 +9,13 @@ const syncDatabaseSchema = async () => {
     return;
   }
 
+  console.log('Generating Prisma client...');
+  runCommand('npx prisma generate', projectRoot);
   console.log('Syncing database schema with Prisma...');
-  runCommand('npx prisma db push --skip-generate', projectRoot);
+  runCommand('npx prisma db push', projectRoot);
 };
 
-const seedDatabaseIfEnabled = async () => {
+const seedDatabaseIfEnabled = async (prisma) => {
   if (!env.autoDbSeedOnStart) {
     return;
   }
@@ -32,8 +32,10 @@ const seedDatabaseIfEnabled = async () => {
 const startServer = async () => {
   try {
     await syncDatabaseSchema();
+    const prisma = require('./config/db');
+    const app = require('./app');
     await prisma.$connect();
-    await seedDatabaseIfEnabled();
+    await seedDatabaseIfEnabled(prisma);
 
     app.listen(env.port, () => {
       console.log(`API running on port ${env.port}`);

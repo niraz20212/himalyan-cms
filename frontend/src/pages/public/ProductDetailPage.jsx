@@ -1,11 +1,14 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { fetchProduct } from '../../api/queries';
+import { Button } from '../../components/common/Button';
 import { Loader } from '../../components/common/Loader';
 import { Seo } from '../../components/common/Seo';
 import { useFetch } from '../../hooks/useFetch';
 
 export function ProductDetailPage() {
   const { slug } = useParams();
+  const user = useSelector((state) => state.auth.user);
   const { data, loading } = useFetch(() => fetchProduct(slug), [slug]);
 
   if (loading) return <div className="mx-auto max-w-7xl px-4 py-14"><Loader /></div>;
@@ -18,6 +21,14 @@ export function ProductDetailPage() {
           <p className="text-sm uppercase tracking-[0.3em] text-[var(--accent)]">{data?.category?.name}</p>
           <h1 className="mt-4 text-4xl font-semibold md:text-6xl">{data?.name}</h1>
           <p className="mt-6 text-lg leading-8 text-[var(--muted)]">{data?.description}</p>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Button as={Link} to={user ? `/account/order?product=${data?.slug}` : '/login'}>
+              {user ? 'Place Order Request' : 'Login To Order'}
+            </Button>
+            <Button as={Link} to="/contact" className="bg-white text-[var(--brand)] hover:bg-[#f4ecdd]">
+              Talk To Sales
+            </Button>
+          </div>
         </div>
         <div className="rounded-[2rem] border border-[var(--line)] bg-[var(--surface-dark)] p-8 text-white">
           <h2 className="text-2xl font-semibold">Specifications</h2>

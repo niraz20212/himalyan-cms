@@ -1,11 +1,21 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { adminLogin } from '../../api/queries';
+import { fetchCurrentUser, loginUser, logoutUser, registerUser } from '../../api/queries';
+import authStorage from '../../utils/authStorage';
 
-export const loginThunk = createAsyncThunk('auth/login', adminLogin);
+export const loginThunk = createAsyncThunk('auth/login', loginUser);
+export const registerThunk = createAsyncThunk('auth/register', registerUser);
+export const fetchMeThunk = createAsyncThunk('auth/me', fetchCurrentUser);
+export const logoutThunk = createAsyncThunk('auth/logout', async (_, { getState }) => {
+  const refreshToken = authStorage.getRefreshToken();
+  if (refreshToken) {
+    await logoutUser(refreshToken);
+  }
+  return getState().auth.user;
+});
 
 const initialState = {
-  user: JSON.parse(localStorage.getItem('hc_user') || 'null'),
-  token: localStorage.getItem('hc_access_token'),
+  user: authStorage.getUser(),
+  token: authStorage.getAccessToken(),
   loading: false,
   error: null,
 };
@@ -14,12 +24,11 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout(state) {
+    clearSession(state) {
       state.user = null;
       state.token = null;
-      localStorage.removeItem('hc_access_token');
-      localStorage.removeItem('hc_refresh_token');
-      localStorage.removeItem('hc_user');
+      state.error = null;
+      authStorage.clearSession();
     },
   },
   extraReducers: (builder) => {
@@ -28,20 +37,50 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.accessToken;
-        localStorage.setItem('hc_access_token', action.payload.accessToken);
-        localStorage.setItem('hc_refresh_token', action.payload.refreshToken);
-        localStorage.setItem('hc_user', JSON.stringify(action.payload.user));
+      .addCase(loginThunk.fulfilled, applyAuthPayload)
+      .addCase(loginThunk.rejected, authRejected)
+      .addCase(registerThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(loginThunk.rejected, (state, action) => {
+      .addCase(registerThunk.fulfilled, applyAuthPayload)
+      .addCase(registerThunk.rejected, authRejected)
+      .addCase(fetchMeThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchMeThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        authStorage.setUser(action.payload);
+      })
+      .addCase(fetchMeThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
+        state.error = null;
+        authStorage.clearSession();
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+function applyAuthPayload(state, action) {
+  state.loading = false;
+  state.user = action.payload.user;
+  state.token = action.payload.accessToken;
+  authStorage.setSession({
+    accessToken: action.payload.accessToken,
+    refreshToken: action.payload.refreshToken,
+    user: action.payload.user,
+  });
+}
+
+function authRejected(state, action) {
+  state.loading = false;
+  state.error = action.error.message;
+}
+
+export const { clearSession } = authSlice.actions;
 export default authSlice.reducer;
