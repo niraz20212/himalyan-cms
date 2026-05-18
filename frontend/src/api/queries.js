@@ -9,7 +9,8 @@ export const fetchBlog = async (slug) => (await api.get(`/public/blogs/${slug}`)
 export const fetchPage = async (slug) => (await api.get(`/public/pages/${slug}`)).data.data;
 export const submitInquiry = async (payload) => (await api.post('/public/inquiries', payload)).data;
 export const loginUser = async (payload) => (await api.post('/auth/login', payload)).data.data;
-export const registerUser = async (payload) => (await api.post('/auth/register', payload)).data.data;
+export const requestRegisterCode = async (payload) => (await api.post('/auth/register', payload)).data.data;
+export const verifyRegisterCode = async (payload) => (await api.post('/auth/register/verify', payload)).data.data;
 export const fetchCurrentUser = async () => (await api.get('/auth/me')).data.data;
 export const logoutUser = async (refreshToken) => (await api.post('/auth/logout', { refreshToken })).data.data;
 export const createOrder = async (payload) => (await api.post('/orders', payload)).data.data;

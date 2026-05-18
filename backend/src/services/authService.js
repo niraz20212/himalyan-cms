@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/db');
 const env = require('../config/env');
+const mailer = require('../config/mailer');
 const AppError = require('../utils/appError');
 const { signAccessToken, signRefreshToken } = require('../utils/tokens');
 
@@ -13,10 +14,67 @@ const serializeUser = (user) => ({
   role: user.role?.name,
 });
 
-const register = async ({ name, lastName, email, password }) => {
+const sendRegistrationCode = async ({ name, lastName, email, password }) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     throw new AppError('Email already registered', 409);
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const verificationCode = `${Math.floor(100000 + Math.random() * 900000)}`;
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  await prisma.pendingRegistration.upsert({
+    where: { email },
+    update: {
+      name,
+      lastName,
+      passwordHash: hashedPassword,
+      verificationCode,
+      expiresAt,
+    },
+    create: {
+      email,
+      name,
+      lastName,
+      passwordHash: hashedPassword,
+      verificationCode,
+      expiresAt,
+    },
+  });
+
+  await mailer.sendMail({
+    from: env.smtp.from,
+    to: email,
+    subject: 'Your Himalayan Churpi verification code',
+    text: `Your verification code is ${verificationCode}. It expires in 10 minutes.`,
+    html: `<div style="font-family: Arial, sans-serif; line-height:1.6;">
+      <h2>Verify your Himalayan Churpi account</h2>
+      <p>Hello ${name},</p>
+      <p>Your verification code is:</p>
+      <p style="font-size:28px;font-weight:700;letter-spacing:6px;">${verificationCode}</p>
+      <p>This code expires in 10 minutes.</p>
+    </div>`,
+  });
+
+  return { email, message: 'Verification code sent to email' };
+};
+
+const verifyRegistrationCode = async ({ email, code }) => {
+  const pendingRegistration = await prisma.pendingRegistration.findUnique({
+    where: { email },
+  });
+
+  if (!pendingRegistration) {
+    throw new AppError('No pending signup found for this email', 404);
+  }
+
+  if (pendingRegistration.expiresAt < new Date()) {
+    throw new AppError('Verification code expired. Please request a new code.', 400);
+  }
+
+  if (pendingRegistration.verificationCode !== code) {
+    throw new AppError('Invalid verification code', 400);
   }
 
   const userRole = await prisma.role.upsert({
@@ -25,16 +83,19 @@ const register = async ({ name, lastName, email, password }) => {
     create: { name: 'USER' },
   });
 
-  const hashedPassword = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
     data: {
-      name,
-      lastName,
-      email,
-      password: hashedPassword,
+      name: pendingRegistration.name,
+      lastName: pendingRegistration.lastName,
+      email: pendingRegistration.email,
+      password: pendingRegistration.passwordHash,
       roleId: userRole.id,
     },
     include: { role: true },
+  });
+
+  await prisma.pendingRegistration.delete({
+    where: { email },
   });
 
   const payload = { id: user.id, role: user.role.name };
@@ -149,4 +210,4 @@ const getCurrentUser = async (userId) => {
   return serializeUser(user);
 };
 
-module.exports = { register, login, refresh, logout, getCurrentUser };
+module.exports = { sendRegistrationCode, verifyRegistrationCode, login, refresh, logout, getCurrentUser };

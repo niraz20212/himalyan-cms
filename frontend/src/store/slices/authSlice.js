@@ -1,10 +1,20 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchCurrentUser, loginUser, logoutUser, registerUser } from '../../api/queries';
+import { fetchCurrentUser, loginUser, logoutUser, requestRegisterCode, verifyRegisterCode } from '../../api/queries';
 import authStorage from '../../utils/authStorage';
 
-export const loginThunk = createAsyncThunk('auth/login', loginUser);
-export const registerThunk = createAsyncThunk('auth/register', registerUser);
-export const fetchMeThunk = createAsyncThunk('auth/me', fetchCurrentUser);
+const createApiThunk = (type, apiFn) =>
+  createAsyncThunk(type, async (payload, { rejectWithValue }) => {
+    try {
+      return await apiFn(payload);
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message || error?.message || 'Request failed');
+    }
+  });
+
+export const loginThunk = createApiThunk('auth/login', loginUser);
+export const requestRegisterCodeThunk = createApiThunk('auth/requestRegisterCode', requestRegisterCode);
+export const verifyRegisterCodeThunk = createApiThunk('auth/verifyRegisterCode', verifyRegisterCode);
+export const fetchMeThunk = createApiThunk('auth/me', fetchCurrentUser);
 export const logoutThunk = createAsyncThunk('auth/logout', async (_, { getState }) => {
   const refreshToken = authStorage.getRefreshToken();
   if (refreshToken) {
@@ -18,6 +28,7 @@ const initialState = {
   token: authStorage.getAccessToken(),
   loading: false,
   error: null,
+  registerEmail: null,
 };
 
 const authSlice = createSlice({
@@ -28,7 +39,12 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.error = null;
+      state.registerEmail = null;
       authStorage.clearSession();
+    },
+    clearRegisterState(state) {
+      state.error = null;
+      state.registerEmail = null;
     },
   },
   extraReducers: (builder) => {
@@ -39,12 +55,24 @@ const authSlice = createSlice({
       })
       .addCase(loginThunk.fulfilled, applyAuthPayload)
       .addCase(loginThunk.rejected, authRejected)
-      .addCase(registerThunk.pending, (state) => {
+      .addCase(requestRegisterCodeThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerThunk.fulfilled, applyAuthPayload)
-      .addCase(registerThunk.rejected, authRejected)
+      .addCase(requestRegisterCodeThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.registerEmail = action.payload.email;
+      })
+      .addCase(requestRegisterCodeThunk.rejected, authRejected)
+      .addCase(verifyRegisterCodeThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyRegisterCodeThunk.fulfilled, (state, action) => {
+        applyAuthPayload(state, action);
+        state.registerEmail = null;
+      })
+      .addCase(verifyRegisterCodeThunk.rejected, authRejected)
       .addCase(fetchMeThunk.pending, (state) => {
         state.loading = true;
       })
@@ -79,8 +107,8 @@ function applyAuthPayload(state, action) {
 
 function authRejected(state, action) {
   state.loading = false;
-  state.error = action.error.message;
+  state.error = action.payload || action.error.message;
 }
 
-export const { clearSession } = authSlice.actions;
+export const { clearSession, clearRegisterState } = authSlice.actions;
 export default authSlice.reducer;

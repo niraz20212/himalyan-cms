@@ -2,7 +2,12 @@ const catchAsync = require('../utils/catchAsync');
 const authService = require('../services/authService');
 
 const register = catchAsync(async (req, res) => {
-  const data = await authService.register(req.body);
+  const data = await authService.sendRegistrationCode(req.body);
+  res.status(201).json({ success: true, data });
+});
+
+const verifyRegister = catchAsync(async (req, res) => {
+  const data = await authService.verifyRegistrationCode(req.body);
   res.status(201).json({ success: true, data });
 });
 
@@ -26,4 +31,4 @@ const me = catchAsync(async (req, res) => {
   res.json({ success: true, data });
 });
 
-module.exports = { register, login, refresh, logout, me };
+module.exports = { register, verifyRegister, login, refresh, logout, me };
