@@ -21,3 +21,8 @@ export const createAdminResource = async (resource, payload) => (await api.post(
 export const updateAdminResource = async (resource, id, payload) =>
   (await api.put(`/admin/${resource}/${id}`, payload)).data.data;
 export const deleteAdminResource = async (resource, id) => (await api.delete(`/admin/${resource}/${id}`)).data;
+export const uploadMediaFile = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return (await api.post('/media', formData, { headers: { 'Content-Type': 'multipart/form-data' } })).data.data;
+};

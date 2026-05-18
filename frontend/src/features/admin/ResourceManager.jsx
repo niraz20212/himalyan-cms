@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { createAdminResource, deleteAdminResource, fetchAdminResource, updateAdminResource } from '../../api/queries';
+import { createAdminResource, deleteAdminResource, fetchAdminResource, updateAdminResource, uploadMediaFile } from '../../api/queries';
 import { Button } from '../../components/common/Button';
+import { resolveMediaUrl } from '../../utils/media';
 
 export function ResourceManager({ title, resource, config }) {
   const [items, setItems] = useState([]);
@@ -273,6 +274,7 @@ function formatFieldValue(value, field) {
 
 function FieldRenderer({ field, value, onChange }) {
   const commonClasses = 'mt-2 w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3';
+  const [uploading, setUploading] = useState(false);
 
   if (field.type === 'textarea') {
     return (
@@ -318,6 +320,49 @@ function FieldRenderer({ field, value, onChange }) {
         <span className="text-sm font-semibold text-[var(--brand)]">{field.label}</span>
         <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{field.helpText}</p>
         <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={field.rows || 8} className={`${commonClasses} font-mono text-sm`} />
+      </label>
+    );
+  }
+
+  if (field.type === 'image') {
+    const handleFileChange = async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        setUploading(true);
+        const media = await uploadMediaFile(file);
+        onChange(media.path || media.url);
+        toast.success('Image uploaded');
+      } catch (error) {
+        toast.error(error?.response?.data?.message || error?.message || 'Image upload failed');
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    return (
+      <label className="block">
+        <span className="text-sm font-semibold text-[var(--brand)]">{field.label}</span>
+        <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{field.helpText}</p>
+        {value ? (
+          <img src={resolveMediaUrl(value)} alt={field.label} className="mt-3 h-48 w-full rounded-2xl border border-[var(--line)] object-cover" />
+        ) : (
+          <div className="mt-3 flex h-48 w-full items-center justify-center rounded-2xl border border-dashed border-[var(--line)] bg-[#fcfaf5] text-sm text-[var(--muted)]">
+            No image selected
+          </div>
+        )}
+        <div className="mt-3 flex flex-wrap gap-3">
+          <input type="file" accept="image/*" onChange={handleFileChange} className="rounded-2xl border border-[var(--line)] bg-white px-4 py-3 text-sm" />
+          <input
+            type="text"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder="Or paste image URL"
+            className="min-w-[240px] flex-1 rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
+          />
+        </div>
+        {uploading ? <p className="mt-2 text-sm text-[var(--brand)]">Uploading image...</p> : null}
       </label>
     );
   }

@@ -1,6 +1,7 @@
 const prisma = require('../config/db');
 const catchAsync = require('../utils/catchAsync');
 const publicService = require('../services/publicService');
+const { serializeMedia, serializeProduct } = require('../utils/media');
 
 const home = catchAsync(async (_req, res) => {
   const data = await publicService.getWebsiteSnapshot();
@@ -13,7 +14,7 @@ const products = catchAsync(async (_req, res) => {
     include: { images: { include: { media: true } }, category: true, seo: true },
     orderBy: { createdAt: 'desc' },
   });
-  res.json({ success: true, data });
+  res.json({ success: true, data: data.map(serializeProduct) });
 });
 
 const productBySlug = catchAsync(async (req, res) => {
@@ -26,7 +27,15 @@ const productBySlug = catchAsync(async (req, res) => {
       relatedProducts: { include: { images: { include: { media: true } } } },
     },
   });
-  res.json({ success: true, data });
+  res.json({
+    success: true,
+    data: data
+      ? {
+          ...serializeProduct(data),
+          relatedProducts: (data.relatedProducts || []).map(serializeProduct),
+        }
+      : null,
+  });
 });
 
 const blogs = catchAsync(async (_req, res) => {
@@ -35,7 +44,7 @@ const blogs = catchAsync(async (_req, res) => {
     include: { coverImage: true, seo: true },
     orderBy: { publishedAt: 'desc' },
   });
-  res.json({ success: true, data });
+  res.json({ success: true, data: data.map((blog) => ({ ...blog, coverImage: serializeMedia(blog.coverImage) })) });
 });
 
 const exportCountries = catchAsync(async (_req, res) => {
@@ -44,7 +53,7 @@ const exportCountries = catchAsync(async (_req, res) => {
     include: { flagMedia: true },
     orderBy: { displayOrder: 'asc' },
   });
-  res.json({ success: true, data });
+  res.json({ success: true, data: data.map((country) => ({ ...country, flagMedia: serializeMedia(country.flagMedia) })) });
 });
 
 const blogBySlug = catchAsync(async (req, res) => {
@@ -52,7 +61,7 @@ const blogBySlug = catchAsync(async (req, res) => {
     where: { slug: req.params.slug },
     include: { coverImage: true, seo: true },
   });
-  res.json({ success: true, data });
+  res.json({ success: true, data: data ? { ...data, coverImage: serializeMedia(data.coverImage) } : null });
 });
 
 const pageBySlug = catchAsync(async (req, res) => {

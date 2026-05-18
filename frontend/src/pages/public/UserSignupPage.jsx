@@ -9,7 +9,11 @@ export function UserSignupPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const { register: registerVerify, handleSubmit: handleVerifySubmit } = useForm();
 
   useEffect(() => {
@@ -40,12 +44,49 @@ export function UserSignupPage() {
             <p className="text-sm uppercase tracking-[0.3em] text-[var(--accent)]">Step 1</p>
             <h2 className="mt-3 text-3xl font-semibold">Fill Details And Send OTP</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              <input {...register('name')} placeholder="First name" className="mt-6 w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
-              <input {...register('lastName')} placeholder="Last name" className="mt-6 w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
+              <input
+                {...register('name', { required: 'Please enter your first name.' })}
+                placeholder="First name"
+                className="mt-6 w-full rounded-2xl border border-[var(--line)] px-4 py-3"
+              />
+              <input
+                {...register('lastName', { required: 'Please enter your last name.' })}
+                placeholder="Last name"
+                className="mt-6 w-full rounded-2xl border border-[var(--line)] px-4 py-3"
+              />
             </div>
             <div className="mt-4 space-y-4">
-              <input {...register('email')} placeholder="Email" className="w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
-              <input {...register('password')} type="password" placeholder="Password" className="w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
+              <input
+                {...register('email', {
+                  required: 'Please enter your email address.',
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Please enter a valid email address.',
+                  },
+                })}
+                placeholder="Email"
+                className="w-full rounded-2xl border border-[var(--line)] px-4 py-3"
+              />
+              <input
+                {...register('password', {
+                  required: 'Please enter a password.',
+                  minLength: {
+                    value: 6,
+                    message: 'Password must be at least 8 characters.',
+                  },
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/,
+                    message: 'Password must include uppercase, lowercase, number, and special character.',
+                  },
+                })}
+                type="password"
+                placeholder="Password"
+                className="w-full rounded-2xl border border-[var(--line)] px-4 py-3"
+              />
+              {errors.name ? <p className="text-sm text-red-600">{errors.name.message}</p> : null}
+              {errors.lastName ? <p className="text-sm text-red-600">{errors.lastName.message}</p> : null}
+              {errors.email ? <p className="text-sm text-red-600">{errors.email.message}</p> : null}
+              {errors.password ? <p className="text-sm text-red-600">{errors.password.message}</p> : null}
               {!auth.registerEmail && auth.error ? <p className="text-sm text-red-600">{auth.error}</p> : null}
               {auth.registerEmail ? <p className="text-sm text-[var(--brand)]">Verification code sent to {auth.registerEmail}</p> : null}
               <Button type="submit" className="w-full">{auth.loading && !auth.registerEmail ? 'Sending OTP...' : 'Send OTP'}</Button>

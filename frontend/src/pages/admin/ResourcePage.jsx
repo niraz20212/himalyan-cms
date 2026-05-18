@@ -11,6 +11,7 @@ const resourceConfigs = {
     fields: [
       { name: 'name', label: 'Product name', helpText: 'The main name customers see.' },
       { name: 'slug', label: 'Page URL slug', helpText: 'Use lowercase words with hyphens, for example classic-himalayan-yak-chew.' },
+      { name: 'imageUrl', label: 'Product image', type: 'image', helpText: 'Upload an image file or paste a direct image link.', optional: true },
       { name: 'shortDesc', label: 'Short description', type: 'textarea', rows: 3, helpText: 'Short summary used in product cards.' },
       { name: 'description', label: 'Full description', type: 'textarea', rows: 5, helpText: 'Longer explanation for the product detail page.', optional: true },
       { name: 'sku', label: 'SKU', helpText: 'Internal or export code.', optional: true },

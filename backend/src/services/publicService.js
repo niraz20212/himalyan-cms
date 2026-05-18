@@ -1,4 +1,5 @@
 const prisma = require('../config/db');
+const { serializeMedia, serializeProduct } = require('../utils/media');
 
 const getWebsiteSnapshot = async () => {
   const [companyInfo, settings, homePage, products, categories, blogs, testimonials, faqs, certifications, countries, menus, files] =
@@ -31,18 +32,24 @@ const getWebsiteSnapshot = async () => {
     ]);
 
   return {
-    companyInfo,
+    companyInfo: companyInfo
+      ? {
+          ...companyInfo,
+          logo: serializeMedia(companyInfo.logo),
+          brochure: serializeMedia(companyInfo.brochure),
+        }
+      : null,
     settings,
     pages: { home: homePage },
-    featuredProducts: products,
+    featuredProducts: products.map(serializeProduct),
     categories,
-    blogs,
-    testimonials,
+    blogs: blogs.map((blog) => ({ ...blog, coverImage: serializeMedia(blog.coverImage) })),
+    testimonials: testimonials.map((testimonial) => ({ ...testimonial, avatar: serializeMedia(testimonial.avatar) })),
     faqs,
-    certifications,
-    exportCountries: countries,
+    certifications: certifications.map((certification) => ({ ...certification, logo: serializeMedia(certification.logo) })),
+    exportCountries: countries.map((country) => ({ ...country, flagMedia: serializeMedia(country.flagMedia) })),
     menus,
-    downloadableFiles: files,
+    downloadableFiles: files.map((file) => ({ ...file, media: serializeMedia(file.media) })),
   };
 };
 

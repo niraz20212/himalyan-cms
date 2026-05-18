@@ -5,6 +5,7 @@ import { Button } from '../../components/common/Button';
 import { Loader } from '../../components/common/Loader';
 import { Seo } from '../../components/common/Seo';
 import { useFetch } from '../../hooks/useFetch';
+import { resolveMediaUrl } from '../../utils/media';
 
 export function ProductDetailPage() {
   const { slug } = useParams();
@@ -18,6 +19,13 @@ export function ProductDetailPage() {
       <Seo title={data?.seo?.metaTitle || data?.name} description={data?.seo?.metaDescription || data?.shortDesc} />
       <div className="grid gap-8 md:grid-cols-[1fr_0.9fr]">
         <div className="rounded-[2rem] border border-[var(--line)] bg-white/80 p-8">
+          {data?.imageUrl ? (
+            <img src={resolveMediaUrl(data.imageUrl)} alt={data.name} className="mb-6 h-[360px] w-full rounded-[1.5rem] object-cover" />
+          ) : (
+            <div className="mb-6 flex h-[360px] w-full items-center justify-center rounded-[1.5rem] bg-[#efe6d6] text-sm font-semibold text-[var(--brand)]">
+              No Product Image
+            </div>
+          )}
           <p className="text-sm uppercase tracking-[0.3em] text-[var(--accent)]">{data?.category?.name}</p>
           <h1 className="mt-4 text-4xl font-semibold md:text-6xl">{data?.name}</h1>
           <p className="mt-6 text-lg leading-8 text-[var(--muted)]">{data?.description}</p>
