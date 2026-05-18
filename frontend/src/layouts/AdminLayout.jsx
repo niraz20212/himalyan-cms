@@ -6,6 +6,7 @@ const navItems = [
   { label: 'Dashboard', href: '/admin' },
   { label: 'Products', href: '/admin/products' },
   { label: 'Categories', href: '/admin/categories' },
+  { label: 'Export Countries', href: '/admin/exportCountries' },
   { label: 'Blogs', href: '/admin/blogs' },
   { label: 'Pages', href: '/admin/pages' },
   { label: 'Settings', href: '/admin/websiteSettings' },

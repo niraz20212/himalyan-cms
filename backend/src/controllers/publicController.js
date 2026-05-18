@@ -38,6 +38,15 @@ const blogs = catchAsync(async (_req, res) => {
   res.json({ success: true, data });
 });
 
+const exportCountries = catchAsync(async (_req, res) => {
+  const data = await prisma.exportCountry.findMany({
+    where: { deletedAt: null },
+    include: { flagMedia: true },
+    orderBy: { displayOrder: 'asc' },
+  });
+  res.json({ success: true, data });
+});
+
 const blogBySlug = catchAsync(async (req, res) => {
   const data = await prisma.blog.findUnique({
     where: { slug: req.params.slug },
@@ -77,4 +86,4 @@ ${urls
   res.type('application/xml').send(xml);
 });
 
-module.exports = { home, products, productBySlug, blogs, blogBySlug, pageBySlug, sitemap };
+module.exports = { home, products, productBySlug, blogs, exportCountries, blogBySlug, pageBySlug, sitemap };

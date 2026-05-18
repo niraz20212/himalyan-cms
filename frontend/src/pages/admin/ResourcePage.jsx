@@ -5,6 +5,7 @@ import { ResourceManager } from '../../features/admin/ResourceManager';
 const samples = {
   products: JSON.stringify({ name: 'New Product', slug: 'new-product', shortDesc: 'Short description' }, null, 2),
   categories: JSON.stringify({ name: 'New Category', slug: 'new-category' }, null, 2),
+  exportCountries: JSON.stringify({ name: 'Canada', code: 'CA', description: 'North American market', displayOrder: 4 }, null, 2),
   blogs: JSON.stringify({ title: 'New Blog', slug: 'new-blog', excerpt: 'Excerpt', content: '<p>Content</p>' }, null, 2),
   pages: JSON.stringify({ title: 'About Us', slug: 'about-us', summary: 'About page', template: 'default' }, null, 2),
   websiteSettings: JSON.stringify({ key: 'homepage_video', value: { url: 'https://example.com/video.mp4' } }, null, 2),

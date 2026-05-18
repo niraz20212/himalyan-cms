@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import { createOrder, fetchProducts } from '../../api/queries';
+import { createOrder, fetchExportCountries, fetchProducts } from '../../api/queries';
 import { Button } from '../../components/common/Button';
 import { Loader } from '../../components/common/Loader';
 import { Seo } from '../../components/common/Seo';
@@ -13,6 +13,7 @@ export function OrderRequestPage() {
   const [searchParams] = useSearchParams();
   const auth = useSelector((state) => state.auth);
   const { data: products, loading } = useFetch(fetchProducts, []);
+  const { data: countries, loading: countriesLoading } = useFetch(fetchExportCountries, []);
   const selectedProductSlug = searchParams.get('product');
   const selectedProduct = useMemo(
     () => products?.find((product) => product.slug === selectedProductSlug) || null,
@@ -83,7 +84,7 @@ export function OrderRequestPage() {
           ) : null}
         </div>
         <div className="rounded-[2rem] border border-[var(--line)] bg-white/85 p-8">
-          {loading ? (
+          {loading || countriesLoading ? (
             <Loader />
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -95,7 +96,14 @@ export function OrderRequestPage() {
                 <input {...register('phone')} placeholder="Phone" className="w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <input {...register('country')} placeholder="Country" className="w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
+                <select {...register('country')} className="w-full rounded-2xl border border-[var(--line)] px-4 py-3">
+                  <option value="">Select country</option>
+                  {countries?.map((country) => (
+                    <option key={country.id} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
                 <input {...register('quantity')} placeholder="Requested quantity" className="w-full rounded-2xl border border-[var(--line)] px-4 py-3" />
               </div>
               <select {...register('orderType')} className="w-full rounded-2xl border border-[var(--line)] px-4 py-3">

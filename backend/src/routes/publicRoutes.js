@@ -10,6 +10,7 @@ router.get('/home', controller.home);
 router.get('/products', controller.products);
 router.get('/products/:slug', controller.productBySlug);
 router.get('/blogs', controller.blogs);
+router.get('/export-countries', controller.exportCountries);
 router.get('/blogs/:slug', controller.blogBySlug);
 router.get('/pages/:slug', controller.pageBySlug);
 router.get('/sitemap.xml', controller.sitemap);
