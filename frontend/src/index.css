@@ -1,16 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --bg: #f6f0e4;
-  --surface: #fffdf7;
-  --surface-dark: #183126;
-  --brand: #294936;
-  --brand-soft: #78866b;
-  --accent: #b98247;
-  --text: #1d241f;
-  --muted: #5e665f;
-  --line: rgba(41, 73, 54, 0.12);
-  font-family: "Segoe UI", sans-serif;
+  --bg: #edf7f6;
+  --surface: #fbfffe;
+  --surface-soft: rgba(251, 255, 254, 0.84);
+  --surface-dark: #07313d;
+  --brand: #0b5f73;
+  --brand-soft: #8dbdb6;
+  --accent: #d98732;
+  --accent-soft: #ffd08a;
+  --text: #10282f;
+  --muted: #577078;
+  --line: rgba(11, 95, 115, 0.14);
+  --shadow-soft: 0 18px 50px rgba(13, 76, 91, 0.08);
+  --shadow-strong: 0 28px 80px rgba(7, 49, 61, 0.16);
+  --font-body: "Manrope", sans-serif;
+  --font-display: "Cormorant Garamond", serif;
+  font-family: var(--font-body);
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -32,8 +39,9 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(185, 130, 71, 0.18), transparent 24%),
-    linear-gradient(180deg, #fbf8f1 0%, #f4ecdd 100%);
+    linear-gradient(115deg, rgba(11, 95, 115, 0.12), transparent 32%),
+    linear-gradient(245deg, rgba(217, 135, 50, 0.16), transparent 30%),
+    linear-gradient(180deg, #f8fffe 0%, #edf7f6 48%, #e3f0ee 100%);
 }
 
 a {
@@ -43,4 +51,185 @@ a {
 
 #root {
   min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+
+::selection {
+  background: rgba(217, 135, 50, 0.22);
+  color: var(--brand);
+}
+
+.glass-panel {
+  background: linear-gradient(180deg, rgba(251, 255, 254, 0.9), rgba(237, 247, 246, 0.72));
+  backdrop-filter: blur(18px);
+}
+
+.section-wash {
+  position: relative;
+}
+
+.section-wash::before {
+  content: "";
+  position: absolute;
+  inset: -12% auto auto -10%;
+  width: 16rem;
+  height: 16rem;
+  background: linear-gradient(135deg, rgba(141, 189, 182, 0.42), transparent 72%);
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+.grid-radial {
+  background-image:
+    linear-gradient(rgba(11, 95, 115, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 95, 115, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center;
+}
+
+.aurora-shell,
+.alpine-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.aurora-shell::before,
+.aurora-shell::after,
+.alpine-shell::before,
+.alpine-shell::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  filter: blur(6px);
+}
+
+.aurora-shell::before,
+.alpine-shell::before {
+  top: -8rem;
+  right: -4rem;
+  width: 18rem;
+  height: 18rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.42), transparent 70%);
+  animation: drift 14s ease-in-out infinite;
+}
+
+.aurora-shell::after,
+.alpine-shell::after {
+  bottom: -6rem;
+  left: -5rem;
+  width: 16rem;
+  height: 16rem;
+  background: linear-gradient(145deg, rgba(255, 208, 138, 0.48), transparent 68%);
+  animation: floatY 12s ease-in-out infinite;
+}
+
+.floating-orb {
+  animation: floatY 7.5s ease-in-out infinite;
+}
+
+.shimmer-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: shimmer 4.8s linear infinite;
+}
+
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-18px, 16px, 0) scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.product-flow {
+  background-image:
+    linear-gradient(120deg, transparent 0 44%, rgba(255, 255, 255, 0.12) 45%, transparent 48%),
+    linear-gradient(60deg, transparent 0 58%, rgba(255, 208, 138, 0.12) 59%, transparent 62%);
+  background-size: 160px 160px, 220px 220px;
+  animation: productFlow 16s linear infinite;
+}
+
+@keyframes productFlow {
+  100% {
+    background-position: 320px 160px, -220px 220px;
+  }
+}
+
+.animate-spotlight {
+  animation: spotlight 2s ease 0.2s 1 forwards;
+}
+
+.loader {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 3px solid rgba(255, 255, 255, 0.24);
+  border-top-color: #ffd08a;
+  border-radius: 999px;
+  animation: spin 0.8s linear infinite;
+}
+
+.spline-hero,
+.spline-hero * {
+  outline: none !important;
+}
+
+.spline-hero canvas {
+  display: block;
+}
+
+.hero-dog-cursor,
+.hero-dog-cursor * {
+  cursor: none;
+}
+
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+    transform: translate(-72%, -62%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
