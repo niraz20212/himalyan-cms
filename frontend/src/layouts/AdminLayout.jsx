@@ -4,6 +4,7 @@ import { logoutThunk } from '../store/slices/authSlice';
 
 const navItems = [
   { label: 'Dashboard', href: '/admin' },
+  { label: 'Homepage', href: '/admin/homepage' },
   { label: 'Products', href: '/admin/products' },
   { label: 'Categories', href: '/admin/categories' },
   { label: 'Export Countries', href: '/admin/exportCountries' },

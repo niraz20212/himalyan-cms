@@ -20,6 +20,7 @@ import { AdminLoginPage } from '../pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage';
 import { ResourcePage } from '../pages/admin/ResourcePage';
 import { AdminOrdersPage } from '../pages/admin/AdminOrdersPage';
+import { AdminHomepagePage } from '../pages/admin/AdminHomepagePage';
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { index: true, element: <AdminDashboardPage /> },
+          { path: 'homepage', element: <AdminHomepagePage /> },
           { path: 'orders', element: <AdminOrdersPage /> },
           { path: ':resource', element: <ResourcePage /> },
         ],

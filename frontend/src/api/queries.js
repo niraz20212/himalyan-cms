@@ -21,6 +21,8 @@ export const createAdminResource = async (resource, payload) => (await api.post(
 export const updateAdminResource = async (resource, id, payload) =>
   (await api.put(`/admin/${resource}/${id}`, payload)).data.data;
 export const deleteAdminResource = async (resource, id) => (await api.delete(`/admin/${resource}/${id}`)).data;
+export const fetchAdminHomepage = async () => (await api.get('/admin/homepage')).data.data;
+export const updateAdminHomepage = async (payload) => (await api.put('/admin/homepage', payload)).data.data;
 export const uploadMediaFile = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
